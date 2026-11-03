@@ -14,14 +14,13 @@ const (
 
 // generateRandomElements generates random elements.
 func generateRandomElements(size int) []int {
-	if size <= 0 || size > 100_000_000 {
+	if size <= 0 {
 		fmt.Printf("incorrect amount of numbers: %d\n", size)
 		return nil
 	}
 	res := make([]int, size)
 	for i := 0; i < size; i++ {
-		num := rand.Intn(size)
-		res[i] = num
+		res[i] = rand.Intn(size)
 	}
 	return res
 }
@@ -47,23 +46,30 @@ func maxChunks(data []int) int {
 		fmt.Print("data is empty\n")
 		return 0
 	}
+
+	actualChunks := CHUNKS
+	if len(data) < CHUNKS {
+		actualChunks = len(data)
+	}
+
 	var wg sync.WaitGroup
-	maxOfMax := make([]int, CHUNKS)
-	for i := 0; i < CHUNKS; i++ {
+	maxOfMax := make([]int, actualChunks)
+	//chunkSize := len(data)/actualChunks
+
+	for i := 0; i < actualChunks; i++ {
 		wg.Add(1)
+		beginningOfChunk := i * (len(data) / actualChunks)
+		// из любопытства пробовал менять CHUNKS, поэтому добавил следующие строки
+		// на случай если CHUNKS не будет делить SIZE без остатка.
+		// *эту задачу на моем ПК выполняют быстрее всего 5 горутин
+		var endOfChunk int
+		if i == actualChunks-1 {
+			endOfChunk = len(data)
+		} else {
+			endOfChunk = beginningOfChunk + (len(data) / actualChunks)
+		}
 		go func(index int) {
 			defer wg.Done()
-			beginningOfChunk := index * (len(data) / CHUNKS)
-			// из любопытства пробовал менять CHUNKS, поэтому добавил следующие строки
-			// на случай если CHUNKS не будет делить SIZE без остатка.
-			// *эту задачу на моем ПК выполняют быстрее всего 5 горутин
-			var endOfChunk int
-			if index == CHUNKS-1 {
-				endOfChunk = len(data)
-			} else {
-				endOfChunk = index*(len(data)/CHUNKS) + (len(data) / CHUNKS)
-			}
-
 			number := maximum(data[beginningOfChunk:endOfChunk])
 			maxOfMax[index] = number
 		}(i)
