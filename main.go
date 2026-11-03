@@ -42,14 +42,10 @@ func maximum(data []int) int {
 
 // maxChunks returns the maximum number of elements in a chunks.
 func maxChunks(data []int) int {
-	if len(data) == 0 {
-		fmt.Print("data is empty\n")
-		return 0
-	}
-
 	if len(data) < CHUNKS {
 		return maximum(data)
 	}
+
 	var wg sync.WaitGroup
 	maxOfMax := make([]int, CHUNKS)
 	for i := 0; i < CHUNKS; i++ {
