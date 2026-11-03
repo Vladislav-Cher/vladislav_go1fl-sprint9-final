@@ -47,26 +47,22 @@ func maxChunks(data []int) int {
 		return 0
 	}
 
-	actualChunks := CHUNKS
 	if len(data) < CHUNKS {
-		actualChunks = len(data)
+		return maximum(data)
 	}
-
 	var wg sync.WaitGroup
-	maxOfMax := make([]int, actualChunks)
-	//chunkSize := len(data)/actualChunks
-
-	for i := 0; i < actualChunks; i++ {
+	maxOfMax := make([]int, CHUNKS)
+	for i := 0; i < CHUNKS; i++ {
 		wg.Add(1)
-		beginningOfChunk := i * (len(data) / actualChunks)
+		beginningOfChunk := i * (len(data) / CHUNKS)
 		// из любопытства пробовал менять CHUNKS, поэтому добавил следующие строки
 		// на случай если CHUNKS не будет делить SIZE без остатка.
 		// *эту задачу на моем ПК выполняют быстрее всего 5 горутин
 		var endOfChunk int
-		if i == actualChunks-1 {
+		if i == CHUNKS-1 {
 			endOfChunk = len(data)
 		} else {
-			endOfChunk = beginningOfChunk + (len(data) / actualChunks)
+			endOfChunk = i*(len(data)/CHUNKS) + (len(data) / CHUNKS)
 		}
 		go func(index int) {
 			defer wg.Done()
